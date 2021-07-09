@@ -12,18 +12,18 @@ WORKDIR /root
 
 # Install sbt
 RUN \
-  curl -L -o sbt-$SBT_VERSION.deb https://dl.bintray.com/sbt/debian/sbt-$SBT_VERSION.deb && \
-  dpkg -i sbt-$SBT_VERSION.deb && \
-  rm sbt-$SBT_VERSION.deb
+  curl -L -o sbt-$SBT_VERSION.tgz https://github.com/sbt/sbt/releases/download/v$SBT_VERSION/sbt-$SBT_VERSION.tgz && \
+  tar zxf ./sbt-$SBT_VERSION.tgz && \
+  export PATH=$PATH:./sbt/bin
 
 # Prepare sbt
 RUN \
-  sbt sbtVersion && \
+  ./sbt/bin/sbt sbtVersion && \
   mkdir -p project && \
   echo "scalaVersion := \"${SCALA_VERSION}\"" > build.sbt && \
   echo "sbt.version=${SBT_VERSION}" > project/build.properties && \
   echo "case object Temp" > Temp.scala && \
-  sbt compile && \
+  ./sbt/bin/sbt compile && \
   rm -r project && rm build.sbt && rm Temp.scala && rm -r target
 
   ADD entrypoint.sh /entrypoint.sh
